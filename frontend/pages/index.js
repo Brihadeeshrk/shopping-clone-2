@@ -1,6 +1,18 @@
 import Head from "next/head";
+import { useQuery } from "urql";
+import { PRODUCT_QUERY } from "../lib/query";
+import Product from "../components/Products";
+import { Gallery } from "../styles/Gallery";
 
 export default function Home() {
+  const [results] = useQuery({ query: PRODUCT_QUERY });
+  const { data, fetching, error } = results;
+
+  //checking for data
+  if (fetching) return <p>Fetching Data from GraphQL</p>;
+  if (error) return <p>Error Encountered</p>;
+  const products = data.products.data;
+
   return (
     <div>
       <Head>
@@ -11,6 +23,11 @@ export default function Home() {
 
       <main>
         <h1>Hello Next</h1>
+        <Gallery>
+          {products.map((product) => (
+            <Product product={product} key={product.attributes.slug} />
+          ))}
+        </Gallery>
       </main>
     </div>
   );
